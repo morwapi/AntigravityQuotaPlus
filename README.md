@@ -107,7 +107,10 @@ npm run lint
 4. **UI Updates** – Parses the response and updates the status bar with formatted quota info
 
 ## Disclaimer
+
 This extension was created by me and Gemini 3 Pro between some Rainbow Six Siege Games, therefore please do not expect the highest code quality in this repo (yet)
+
+This project isn't endorsed by Google and doesn't reflect the views or opinions of Google or anyone officially involved in producing or managing Google/AntiGravity properties
 
 ## License
 
