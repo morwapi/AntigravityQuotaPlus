@@ -12,5 +12,9 @@
     "Model Quotas": "モデル割当量",
     "Resets in:": "リセットまで:",
     "Simple names": "シンプル表示",
-    "Settings": "設定"
+    "Settings": "設定",
+    "Connecting to Antigravity...": "Antigravity に接続中...",
+    "Click to reconnect to Antigravity": "クリックして Antigravity に再接続",
+    "Reconnect": "再接続",
+    "Retry connecting to Antigravity": "Antigravity への接続を再試行"
 }

@@ -63,6 +63,7 @@ function get_simple_name(label: string): string {
 export class StatusBarManager {
 	private item: vscode.StatusBarItem;
 	private last_snapshot: quota_snapshot | undefined;
+	private is_waiting = false;
 
 	constructor() {
 		this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -71,12 +72,28 @@ export class StatusBarManager {
 		this.item.show();
 	}
 
-	show_loading() {
-		this.item.text = '$(sync~spin) AGQ';
+	show_loading(suffix?: string) {
+		this.is_waiting = false;
+		this.item.text = suffix ? `$(sync~spin) AGQ ${suffix}` : '$(sync~spin) AGQ';
+		this.item.tooltip = vscode.l10n.t('Connecting to Antigravity...');
+		this.item.backgroundColor = undefined;
 		this.item.show();
 	}
 
+	show_waiting() {
+		this.is_waiting = true;
+		this.item.text = '$(warning) AGQ';
+		this.item.tooltip = vscode.l10n.t('Click to reconnect to Antigravity');
+		this.item.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+		this.item.show();
+	}
+
+	is_in_waiting_state(): boolean {
+		return this.is_waiting;
+	}
+
 	show_error(msg: string) {
+		this.is_waiting = false;
 		this.item.text = '$(error) AGQ';
 		this.item.tooltip = msg;
 		this.item.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
@@ -138,7 +155,11 @@ export class StatusBarManager {
 
 		// Action the tracked item when user accepts (click/Enter)
 		pick.onDidAccept(async () => {
-			if (currentActiveItem && 'action' in currentActiveItem && (currentActiveItem as any).action === 'toggle_simple_names') {
+			if (currentActiveItem && 'action' in currentActiveItem && (currentActiveItem as any).action === 'reconnect') {
+				// Trigger reconnect command
+				pick.hide();
+				vscode.commands.executeCommand('agq.reconnect');
+			} else if (currentActiveItem && 'action' in currentActiveItem && (currentActiveItem as any).action === 'toggle_simple_names') {
 				await this.toggle_simple_names();
 				// Refresh the menu items to reflect the change
 				pick.items = this.build_menu_items();
@@ -201,6 +222,17 @@ export class StatusBarManager {
 		const snapshot = this.last_snapshot;
 		const pinned = this.get_pinned_models();
 		const use_simple = this.get_use_simple_names();
+
+		// Show reconnect button if in waiting state
+		if (this.is_waiting) {
+			const reconnect_item: vscode.QuickPickItem & { action?: string } = {
+				label: `$(refresh) ${vscode.l10n.t('Reconnect')}`,
+				description: vscode.l10n.t('Retry connecting to Antigravity'),
+			};
+			(reconnect_item as any).action = 'reconnect';
+			items.push(reconnect_item);
+			items.push({ label: '', kind: vscode.QuickPickItemKind.Separator });
+		}
 
 		// Settings section
 		items.push({ label: vscode.l10n.t('Settings'), kind: vscode.QuickPickItemKind.Separator });

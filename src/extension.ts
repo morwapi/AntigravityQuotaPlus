@@ -3,11 +3,11 @@
  */
 
 import * as vscode from 'vscode';
-import {ConfigManager} from './core/config_manager';
-import {ProcessFinder} from './core/process_finder';
-import {QuotaManager} from './core/quota_manager';
-import {StatusBarManager} from './ui/status_bar';
-import {logger} from './utils/logger';
+import { ConfigManager } from './core/config_manager';
+import { ProcessFinder } from './core/process_finder';
+import { QuotaManager } from './core/quota_manager';
+import { StatusBarManager } from './ui/status_bar';
+import { logger } from './utils/logger';
 
 let config_manager: ConfigManager;
 let process_finder: ProcessFinder;
@@ -116,20 +116,29 @@ export async function activate(context: vscode.ExtensionContext) {
 	logger.info('Extension', 'Extension activation complete');
 }
 
-async function initialize_extension() {
+async function initialize_extension(attempt = 0) {
 	if (is_initialized) {
 		logger.debug('Extension', 'Already initialized, skipping');
 		return;
 	}
 
-	logger.section('Extension', 'Initializing Extension');
-	const timer = logger.time_start('initialize_extension');
+	// Only show section header on first attempt
+	if (attempt === 0) {
+		logger.section('Extension', 'Initializing Extension');
+	}
 
 	const config = config_manager.get_config();
-	status_bar.show_loading();
+
+	// Calculate retry parameters
+	const MAX_PHASE1_ATTEMPTS = 12; // First minute: 5 seconds x 12 = 60 seconds
+	const MAX_PHASE2_ATTEMPTS = 9;  // 1-10 minutes: 1 minute x 9 = 9 minutes
+	const MAX_ATTEMPTS = MAX_PHASE1_ATTEMPTS + MAX_PHASE2_ATTEMPTS; // 21 total
+
+	// Show loading with attempt count
+	status_bar.show_loading(attempt > 0 ? `(${attempt}/${MAX_ATTEMPTS})` : undefined);
 
 	try {
-		logger.info('Extension', 'Detecting Antigravity process...');
+		logger.info('Extension', `Detecting Antigravity process... (attempt ${attempt + 1}/${MAX_ATTEMPTS})`);
 		const process_info = await process_finder.detect_process_info();
 
 		if (process_info) {
@@ -148,32 +157,48 @@ async function initialize_extension() {
 			is_initialized = true;
 			logger.info('Extension', 'Initialization successful');
 		} else {
-			logger.error('Extension', 'Antigravity process not found');
-			logger.info('Extension', 'Troubleshooting tips:');
-			logger.info('Extension', '   1. Make sure Antigravity extension is installed and enabled');
-			logger.info('Extension', '   2. Check if the language_server process is running');
-			logger.info('Extension', '   3. Try reloading VS Code');
-			logger.info('Extension', '   4. Open "Output" panel and select "Antigravity Quota" for detailed logs');
+			// Determine retry strategy
+			let delay = 0;
+			let should_retry = false;
 
-			status_bar.show_error('Antigravity process not found');
-			vscode.window.showErrorMessage(
-				vscode.l10n.t('Could not find Antigravity process. Is it running? Use "AGQ: Show Debug Log" to see details.'),
-				vscode.l10n.t('Show Logs')
-			).then(action => {
-				if (action === vscode.l10n.t('Show Logs')) {
-					logger.show();
-				}
-			});
+			if (attempt < MAX_PHASE1_ATTEMPTS) {
+				// Phase 1: First minute, every 5 seconds
+				delay = 5000;
+				should_retry = true;
+				logger.debug('Extension', `Phase 1: Retry in ${delay}ms`);
+			} else if (attempt < MAX_ATTEMPTS) {
+				// Phase 2: 1-10 minutes, every 1 minute
+				delay = 60000;
+				should_retry = true;
+				logger.debug('Extension', `Phase 2: Retry in ${delay}ms`);
+			} else {
+				// Phase 3: Stop retrying, enter waiting state
+				should_retry = false;
+				logger.info('Extension', 'Max retries reached, entering waiting state');
+			}
+
+			if (should_retry) {
+				setTimeout(() => initialize_extension(attempt + 1), delay);
+			} else {
+				// Enter waiting state - no error message, just silent waiting
+				logger.info('Extension', 'Antigravity not found. Waiting for manual reconnect.');
+				status_bar.show_waiting();
+			}
 		}
 	} catch (e: any) {
 		logger.error('Extension', 'Detection failed with exception:', {
 			message: e.message,
 			stack: e.stack,
 		});
-		status_bar.show_error('Detection failed');
-	}
 
-	timer();
+		// Still retry on exception if we haven't reached max attempts
+		if (attempt < MAX_ATTEMPTS) {
+			const delay = attempt < MAX_PHASE1_ATTEMPTS ? 5000 : 60000;
+			setTimeout(() => initialize_extension(attempt + 1), delay);
+		} else {
+			status_bar.show_waiting();
+		}
+	}
 }
 
 export function deactivate() {
