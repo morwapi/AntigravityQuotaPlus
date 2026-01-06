@@ -10,5 +10,7 @@
     "No model data": "モデルデータなし",
     "Waiting for quota info...": "割当量を取得中...",
     "Model Quotas": "モデル割当量",
-    "Resets in:": "リセットまで:"
+    "Resets in:": "リセットまで:",
+    "Simple names": "シンプル表示",
+    "Settings": "設定"
 }

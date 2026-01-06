@@ -6,5 +6,6 @@
     "config.enabled.description": "Enable auto monitoring",
     "config.pollingInterval.description": "Polling interval in seconds (minimum: 30s, recommended: 120s+)",
     "config.pinnedModels.description": "Model IDs to display in the status bar. If empty, shows 'AGQ'.",
-    "config.showPromptCredits.description": "Show prompt credits in the status bar."
+    "config.showPromptCredits.description": "Show prompt credits in the status bar.",
+    "config.useSimpleNames.description": "Use simple model names in status bar (Pro, Flash, Claude, etc.)"
 }

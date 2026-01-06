@@ -66,6 +66,12 @@
           "default": false,
           "description": "%config.showPromptCredits.description%",
           "order": 4
+        },
+        "agq.useSimpleNames": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.useSimpleNames.description%",
+          "order": 5
         }
       }
     }

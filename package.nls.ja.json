@@ -6,5 +6,6 @@
     "config.enabled.description": "自動監視を有効化",
     "config.pollingInterval.description": "更新間隔（秒）（最小: 30秒、推奨: 120秒以上）",
     "config.pinnedModels.description": "ステータスバーに表示するモデルID。空の場合は「AGQ」と表示。",
-    "config.showPromptCredits.description": "ステータスバーにプロンプトクレジットを表示"
+    "config.showPromptCredits.description": "ステータスバーにプロンプトクレジットを表示",
+    "config.useSimpleNames.description": "ステータスバーでシンプルなモデル名を使用（Pro, Flash, Claude など）"
 }

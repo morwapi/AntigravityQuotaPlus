@@ -16,6 +16,17 @@ const MODEL_ABBREVIATIONS: Record<string, string> = {
 	'GPT-OSS 120B (Medium)': 'GPT-OSS (M)',
 };
 
+/** Mapping for simple/short display names */
+const MODEL_SIMPLE_NAMES: Record<string, string> = {
+	'Gemini 3 Pro (High)': 'Pro',
+	'Gemini 3 Pro (Low)': 'Pro',
+	'Gemini 3 Flash': 'Flash',
+	'Claude Sonnet 4.5': 'Claude',
+	'Claude Sonnet 4.5 (Thinking)': 'Claude',
+	'Claude Opus 4.5 (Thinking)': 'Claude',
+	'GPT-OSS 120B (Medium)': 'Claude',
+};
+
 /** Get short abbreviation for a model label */
 function get_abbreviation(label: string): string {
 	if (MODEL_ABBREVIATIONS[label]) {
@@ -35,6 +46,18 @@ function get_abbreviation(label: string): string {
 		})
 		.join('')
 		.slice(0, 5);
+}
+
+/** Get simple display name for a model label */
+function get_simple_name(label: string): string {
+	if (MODEL_SIMPLE_NAMES[label]) {
+		return MODEL_SIMPLE_NAMES[label];
+	}
+	// Fallback: pattern matching
+	if (label.includes('Claude') || label.includes('GPT')) return 'Claude';
+	if (label.includes('Pro')) return 'Pro';
+	if (label.includes('Flash')) return 'Flash';
+	return label.split(' ')[0];
 }
 
 export class StatusBarManager {
@@ -82,8 +105,9 @@ export class StatusBarManager {
 			for (const m of pinned_models) {
 				const pct = m.remaining_percentage !== undefined ? `${m.remaining_percentage.toFixed(0)}%` : 'N/A';
 				const status_icon = m.is_exhausted ? '$(error)' : m.remaining_percentage !== undefined && m.remaining_percentage < 20 ? '$(warning)' : '$(check)';
-				const abbrev = get_abbreviation(m.label);
-				parts.push(`${status_icon} ${abbrev}: ${pct}`);
+				const use_simple = this.get_use_simple_names();
+				const display_name = use_simple ? get_simple_name(m.label) : get_abbreviation(m.label);
+				parts.push(`${status_icon} ${display_name}: ${pct}`);
 			}
 
 			this.item.text = parts.length > 0 ? parts.join('  ') : '$(rocket) AGQ';
@@ -114,7 +138,16 @@ export class StatusBarManager {
 
 		// Action the tracked item when user accepts (click/Enter)
 		pick.onDidAccept(async () => {
-			if (currentActiveItem && 'model_id' in currentActiveItem) {
+			if (currentActiveItem && 'action' in currentActiveItem && (currentActiveItem as any).action === 'toggle_simple_names') {
+				await this.toggle_simple_names();
+				// Refresh the menu items to reflect the change
+				pick.items = this.build_menu_items();
+				// Update status bar immediately if we have a snapshot
+				if (this.last_snapshot) {
+					const config = vscode.workspace.getConfiguration('agq');
+					this.update(this.last_snapshot, !!config.get('showPromptCredits'));
+				}
+			} else if (currentActiveItem && 'model_id' in currentActiveItem) {
 				await this.toggle_pinned_model((currentActiveItem as any).model_id);
 				// Refresh the menu items to reflect the change
 				pick.items = this.build_menu_items();
@@ -152,10 +185,31 @@ export class StatusBarManager {
 		await config.update('pinnedModels', pinned, vscode.ConfigurationTarget.Global);
 	}
 
+	private get_use_simple_names(): boolean {
+		const config = vscode.workspace.getConfiguration('agq');
+		return config.get<boolean>('useSimpleNames') ?? true;
+	}
+
+	private async toggle_simple_names(): Promise<void> {
+		const config = vscode.workspace.getConfiguration('agq');
+		const current = config.get<boolean>('useSimpleNames') ?? true;
+		await config.update('useSimpleNames', !current, vscode.ConfigurationTarget.Global);
+	}
+
 	private build_menu_items(): vscode.QuickPickItem[] {
 		const items: vscode.QuickPickItem[] = [];
 		const snapshot = this.last_snapshot;
 		const pinned = this.get_pinned_models();
+		const use_simple = this.get_use_simple_names();
+
+		// Settings section
+		items.push({ label: vscode.l10n.t('Settings'), kind: vscode.QuickPickItemKind.Separator });
+		const toggle_item: vscode.QuickPickItem & { action?: string } = {
+			label: `$(settings-gear) ${vscode.l10n.t('Simple names')}: ${use_simple ? 'ON' : 'OFF'}`,
+			description: use_simple ? 'Pro, Flash, Claude' : 'Gemini 3 Pro (H), Claude S4.5...',
+		};
+		(toggle_item as any).action = 'toggle_simple_names';
+		items.push(toggle_item);
 
 		items.push({ label: vscode.l10n.t('Model Quotas'), kind: vscode.QuickPickItemKind.Separator });
 
