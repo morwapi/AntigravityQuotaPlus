@@ -54,7 +54,11 @@
         },
         "agq.pinnedModels": {
           "type": "array",
-          "default": [],
+          "default": [
+            "MODEL_PLACEHOLDER_M8",
+            "MODEL_PLACEHOLDER_M18",
+            "MODEL_PLACEHOLDER_M12"
+          ],
           "items": {
             "type": "string"
           },
