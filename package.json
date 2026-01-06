@@ -1,10 +1,11 @@
 {
   "name": "ag-quota",
   "displayName": "Antigravity Quota (AGQ)",
-  "description": "VS Code extension for the Antigravity IDE to monitor the usage of the models",
-  "version": "1.1.0",
+  "description": "%ext.description%",
+  "version": "1.2.0",
   "publisher": "henrikdev",
   "icon": "assets/AntiGravityQuota.png",
+  "l10n": "./l10n",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -24,15 +25,15 @@
     "commands": [
       {
         "command": "agq.refresh",
-        "title": "AGQ: Refresh Now"
+        "title": "%commands.refresh.title%"
       },
       {
         "command": "agq.reconnect",
-        "title": "AGQ: Reconnect"
+        "title": "%commands.reconnect.title%"
       },
       {
         "command": "agq.show_logs",
-        "title": "AGQ: Show Debug Log"
+        "title": "%commands.showLogs.title%"
       }
     ],
     "configuration": {
@@ -41,14 +42,14 @@
         "agq.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable auto monitoring",
+          "description": "%config.enabled.description%",
           "order": 1
         },
         "agq.pollingInterval": {
           "type": "number",
           "default": 120,
           "minimum": 30,
-          "description": "Polling interval in seconds (minimum: 30s, recommended: 120s+)",
+          "description": "%config.pollingInterval.description%",
           "order": 2
         },
         "agq.pinnedModels": {
@@ -57,13 +58,13 @@
           "items": {
             "type": "string"
           },
-          "description": "Model IDs to display in the status bar. If empty, shows 'AGQ'.",
+          "description": "%config.pinnedModels.description%",
           "order": 3
         },
         "agq.showPromptCredits": {
           "type": "boolean",
           "default": false,
-          "description": "Show prompt credits in the status bar.",
+          "description": "%config.showPromptCredits.description%",
           "order": 4
         }
       }
@@ -87,7 +88,7 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/Henrik-3/AntigravityQuota.git"
+    "url": "https://github.com/morwapi/AntigravityQuotaPlus.git"
   },
   "keywords": [
     "antigravity",

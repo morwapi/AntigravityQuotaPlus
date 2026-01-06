@@ -1,0 +1,10 @@
+{
+    "ext.description": "Antigravity IDE 用のモデル使用状況監視ツール",
+    "commands.refresh.title": "AGQ: 今すぐ更新",
+    "commands.reconnect.title": "AGQ: 再接続",
+    "commands.showLogs.title": "AGQ: デバッグログを表示",
+    "config.enabled.description": "自動監視を有効化",
+    "config.pollingInterval.description": "更新間隔（秒）（最小: 30秒、推奨: 120秒以上）",
+    "config.pinnedModels.description": "ステータスバーに表示するモデルID。空の場合は「AGQ」と表示。",
+    "config.showPromptCredits.description": "ステータスバーにプロンプトクレジットを表示"
+}

@@ -35,7 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('agq.refresh', () => {
 			logger.info('Extension', 'Manual refresh triggered');
-			vscode.window.showInformationMessage('Refreshing Quota...');
+			vscode.window.showInformationMessage(vscode.l10n.t('Refreshing Quota...'));
 			quota_manager.fetch_quota();
 		})
 	);
@@ -54,7 +54,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (!is_initialized) {
 				await initialize_extension();
 			} else {
-				vscode.window.showInformationMessage('AGQ is already active');
+				vscode.window.showInformationMessage(vscode.l10n.t('AGQ is already active'));
 			}
 		})
 	);
@@ -62,7 +62,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('agq.reconnect', async () => {
 			logger.info('Extension', 'Reconnect triggered');
-			vscode.window.showInformationMessage('Reconnecting to Antigravity process...');
+			vscode.window.showInformationMessage(vscode.l10n.t('Reconnecting to Antigravity process...'));
 			is_initialized = false;
 			quota_manager.stop_polling();
 			status_bar.show_loading();
@@ -74,7 +74,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('agq.show_logs', () => {
 			logger.info('Extension', 'Opening debug log panel');
 			logger.show();
-			vscode.window.showInformationMessage('Debug log panel opened');
+			vscode.window.showInformationMessage(vscode.l10n.t('Debug log panel opened'));
 		})
 	);
 
@@ -156,8 +156,11 @@ async function initialize_extension() {
 			logger.info('Extension', '   4. Open "Output" panel and select "Antigravity Quota" for detailed logs');
 
 			status_bar.show_error('Antigravity process not found');
-			vscode.window.showErrorMessage('Could not find Antigravity process. Is it running? Use "AGQ: Show Debug Log" to see details.', 'Show Logs').then(action => {
-				if (action === 'Show Logs') {
+			vscode.window.showErrorMessage(
+				vscode.l10n.t('Could not find Antigravity process. Is it running? Use "AGQ: Show Debug Log" to see details.'),
+				vscode.l10n.t('Show Logs')
+			).then(action => {
+				if (action === vscode.l10n.t('Show Logs')) {
 					logger.show();
 				}
 			});

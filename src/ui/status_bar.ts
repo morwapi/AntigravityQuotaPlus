@@ -3,7 +3,7 @@
  */
 
 import * as vscode from 'vscode';
-import {quota_snapshot, model_quota_info} from '../utils/types';
+import { quota_snapshot, model_quota_info } from '../utils/types';
 
 /** Mapping of model labels to short abbreviations for status bar display */
 const MODEL_ABBREVIATIONS: Record<string, string> = {
@@ -90,14 +90,14 @@ export class StatusBarManager {
 		}
 
 		this.item.backgroundColor = undefined;
-		this.item.tooltip = 'Click to view Antigravity Quota details';
+		this.item.tooltip = vscode.l10n.t('Click to view Antigravity Quota details');
 		this.item.show();
 	}
 
 	show_menu() {
 		const pick = vscode.window.createQuickPick();
 		pick.title = 'Antigravity Quota';
-		pick.placeholder = 'Click a model to toggle its visibility in the status bar';
+		pick.placeholder = vscode.l10n.t('Click a model to toggle its visibility in the status bar');
 		pick.matchOnDescription = false;
 		pick.matchOnDetail = false;
 		pick.canSelectMany = false;
@@ -157,7 +157,7 @@ export class StatusBarManager {
 		const snapshot = this.last_snapshot;
 		const pinned = this.get_pinned_models();
 
-		items.push({label: 'Model Quotas', kind: vscode.QuickPickItemKind.Separator});
+		items.push({ label: vscode.l10n.t('Model Quotas'), kind: vscode.QuickPickItemKind.Separator });
 
 		if (snapshot && snapshot.models.length > 0) {
 			for (const m of snapshot.models) {
@@ -170,10 +170,10 @@ export class StatusBarManager {
 				// Show quota status separately
 				const status_icon = m.is_exhausted ? '$(error)' : pct < 20 ? '$(warning)' : '';
 
-				const item: vscode.QuickPickItem & {model_id?: string} = {
+				const item: vscode.QuickPickItem & { model_id?: string } = {
 					label: `${selection_icon} ${status_icon ? status_icon + ' ' : ''}${m.label}`,
 					description: `${bar} ${pct.toFixed(1)}%`,
-					detail: `    Resets in: ${m.time_until_reset_formatted}`,
+					detail: `    ${vscode.l10n.t('Resets in:')} ${m.time_until_reset_formatted}`,
 				};
 
 				// Attach model_id for click handling
@@ -182,8 +182,8 @@ export class StatusBarManager {
 			}
 		} else {
 			items.push({
-				label: '$(info) No model data',
-				description: 'Waiting for quota info...',
+				label: `$(info) ${vscode.l10n.t('No model data')}`,
+				description: vscode.l10n.t('Waiting for quota info...'),
 			});
 		}
 

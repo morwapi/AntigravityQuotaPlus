@@ -1,0 +1,10 @@
+{
+    "ext.description": "VS Code extension for the Antigravity IDE to monitor the usage of the models",
+    "commands.refresh.title": "AGQ: Refresh Now",
+    "commands.reconnect.title": "AGQ: Reconnect",
+    "commands.showLogs.title": "AGQ: Show Debug Log",
+    "config.enabled.description": "Enable auto monitoring",
+    "config.pollingInterval.description": "Polling interval in seconds (minimum: 30s, recommended: 120s+)",
+    "config.pinnedModels.description": "Model IDs to display in the status bar. If empty, shows 'AGQ'.",
+    "config.showPromptCredits.description": "Show prompt credits in the status bar."
+}

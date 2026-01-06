@@ -1,0 +1,14 @@
+{
+    "Refreshing Quota...": "割当量を更新中...",
+    "AGQ is already active": "AGQ は既にアクティブです",
+    "Reconnecting to Antigravity process...": "Antigravity プロセスに再接続中...",
+    "Could not find Antigravity process. Is it running? Use \"AGQ: Show Debug Log\" to see details.": "Antigravity プロセスが見つかりません。起動していますか？「AGQ: デバッグログを表示」で詳細を確認できます。",
+    "Debug log panel opened": "デバッグログパネルを開きました",
+    "Show Logs": "ログを表示",
+    "Click to view Antigravity Quota details": "クリックで詳細を表示",
+    "Click a model to toggle its visibility in the status bar": "モデルをクリックしてステータスバーの表示を切り替え",
+    "No model data": "モデルデータなし",
+    "Waiting for quota info...": "割当量を取得中...",
+    "Model Quotas": "モデル割当量",
+    "Resets in:": "リセットまで:"
+}
